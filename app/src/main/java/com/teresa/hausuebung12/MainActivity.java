@@ -51,20 +51,21 @@ public class MainActivity extends AppCompatActivity {
         switch (data) {
             case "AC":
                 input = "";
+                screen.setText(input);
                 break;
             case "=":
                 solve(input);
-                screen.setText(answer);
                 break;
             default:
                 if (input == null) {
                     input = "";
                 } else {
                     input += data;
+                    screen.setText(input);
                 }
-            
+                break;
         }
-        screen.setText(input);
+       
     }
     
     double res = 0;
@@ -72,9 +73,12 @@ public class MainActivity extends AppCompatActivity {
     private void solve(String numbers) {
         String s = infixToPostFix(numbers);
         List<String> list = new ArrayList<>();
-        for (int i = 0; i < s.length(); i++){
+        for (int i = 0; i < s.length(); i++) {
             list.add(String.valueOf(s.charAt(i)));
         }
         PostFixCalculator pfc = new PostFixCalculator(list);
+        answer = pfc.getResult().toString();
+        screen.setText(answer);
     }
+   
 }
