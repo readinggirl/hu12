@@ -10,7 +10,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.teresa.hausuebung12.InfixToPostFix.infixToPostFix;
 
 public class MainActivity extends AppCompatActivity {
     private TextView screen;
@@ -71,11 +70,8 @@ public class MainActivity extends AppCompatActivity {
     double res = 0;
     
     private void solve(String numbers) {
-        String s = infixToPostFix(numbers);
-        List<String> list = new ArrayList<>();
-        for (int i = 0; i < s.length(); i++) {
-            list.add(String.valueOf(s.charAt(i)));
-        }
+        InfixToPostFix itp = new InfixToPostFix(numbers);
+        List<String> list = itp.getPostfixAsList();
         PostFixCalculator pfc = new PostFixCalculator(list);
         answer = pfc.getResult().toString();
         screen.setText(answer);

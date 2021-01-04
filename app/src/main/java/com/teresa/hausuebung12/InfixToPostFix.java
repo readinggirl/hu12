@@ -1,53 +1,121 @@
 package com.teresa.hausuebung12;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 import java.util.Stack;
 
 public class InfixToPostFix {
+    private String infix; // The infix expression to be converted
+    private Deque<Character> stack = new ArrayDeque<Character>();
+    private List<String> postfix = new ArrayList<String>(); // To hold the postfix expression
     
-    static int precedence(char c){
-        switch (c){
-            case '+':
-            case '-':
-                return 1;
-            case '*':
-            case '/':
-                return 2;
-            case '^':
-                return 3;
-        }
-        return -1;
+    public InfixToPostFix(String expression)
+    {
+        infix = expression;
+        convertExpression();
     }
     
-    static String infixToPostFix(String expression){
+    private void convertExpression()
+    {
+        // Temporary string to hold the number
+        StringBuilder temp = new StringBuilder();
         
-        String result = "";
-        Stack<Character> stack = new Stack<>();
-        for (int i = 0; i <expression.length() ; i++) {
-            char c = expression.charAt(i);
-            
-            //check if char is operator
-            if(precedence(c)>0){
-                while(!stack.isEmpty() && precedence(stack.peek())>=precedence(c)){
-                    result += stack.pop();
+        for(int i = 0; i != infix.length(); ++i)
+        {
+            if(Character.isDigit(infix.charAt(i)))
+            {
+                /* If we encounter a digit, read all digit next to it and append to temp
+                 * until we encounter an operator.
+                 */
+                temp.append(infix.charAt(i));
+                
+                while((i+1) != infix.length() && (Character.isDigit(infix.charAt(i+1))
+                        || infix.charAt(i+1) == '.'))
+                {
+                    temp.append(infix.charAt(++i));
                 }
-                stack.push(c);
-            }else if(c==')'){
-                char x = stack.pop();
-                while(x!='('){
-                    result += x;
-                    x = stack.pop();
+                
+                
+                /* If the loop ends it means the next token is an operator or end of expression
+                 * so we put temp into the postfix list and clear temp for next use
+                 */
+                postfix.add(temp.toString());
+                temp.delete(0, temp.length());
+            }
+            // Getting here means the token is an operator
+            else
+                inputToStack(infix.charAt(i));
+        }
+        clearStack();
+    }
+    
+    
+    private void inputToStack(char input)
+    {
+        if(stack.isEmpty() || input == '(')
+            stack.addLast(input);
+        else
+        {
+            if(input == ')')
+            {
+                while(!stack.getLast().equals('('))
+                {
+                    postfix.add(stack.removeLast().toString());
                 }
-            }else if(c=='('){
-                stack.push(c);
-            }else{
-                //character is neither operator nor ( 
-                result += c;
+                stack.removeLast();
+            }
+            else
+            {
+                if(stack.getLast().equals('('))
+                    stack.addLast(input);
+                else
+                {
+                    while(!stack.isEmpty() && !stack.getLast().equals('(') &&
+                            getPrecedence(input) <= getPrecedence(stack.getLast()))
+                    {
+                        postfix.add(stack.removeLast().toString());
+                    }
+                    stack.addLast(input);
+                }
             }
         }
-        for (int i = 0; i <=stack.size() ; i++) {
-            result += stack.pop();
+    }
+    
+    
+    private int getPrecedence(char op)
+    {
+        if (op == '+' || op == '-')
+            return 1;
+        else if (op == '*' || op == '/')
+            return 2;
+        else if (op == '^')
+            return 3;
+        else return 0;
+    }
+    
+    private void clearStack()
+    {
+        while(!stack.isEmpty())
+        {
+            postfix.add(stack.removeLast().toString());
         }
-        return result;
+    }
+    
+    
+    public void printExpression()
+    {
+        for(String str : postfix)
+        {
+            System.out.print(str + ' ');
+        }
+    }
+    
+    
+    public List<String> getPostfixAsList()
+    {
+        return postfix;
     }
     
 }
